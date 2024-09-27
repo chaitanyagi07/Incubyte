@@ -1,3 +1,4 @@
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { BooksService } from './books.service';
 import { getModelToken } from '@nestjs/mongoose';
@@ -10,17 +11,34 @@ describe('BooksService', () => {
   let bookModel: Model<Book>;
   let userModel: Model<User>;
 
-  
-  const mockBookModel = jest.fn().mockImplementation(() => ({
+  const mockBookInstance = {
+    _id: 'bookId',
+    title: 'Test Book',
+    author: 'Test Author',
+    count: 1,
+    isAvailable: true,
     save: jest.fn().mockResolvedValue({
+      _id: 'bookId',
       title: 'Test Book',
       author: 'Test Author',
-      count: 5,
-      isAvailable: true,
+      count: 0,
+      isAvailable: false,
     }),
-  }));
+  };
 
-  const mockUserModel = {};
+  const mockUserInstance = {
+    _id: 'userId',
+    borrowedBooks: [],
+    save: jest.fn().mockResolvedValue(true),
+  };
+
+  const mockBookModel = {
+    findById: jest.fn().mockResolvedValue(mockBookInstance),
+  };
+
+  const mockUserModel = {
+    findById: jest.fn().mockResolvedValue(mockUserInstance),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -32,7 +50,7 @@ describe('BooksService', () => {
         },
         {
           provide: getModelToken(User.name),
-          useValue: mockUserModel, 
+          useValue: mockUserModel,
         },
       ],
     }).compile();
@@ -46,27 +64,21 @@ describe('BooksService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('addBook', () => {
-    it('should create and save a new book', async () => {
-      const title = 'Test Book';
-      const author = 'Test Author';
-      const count = 5;
+  describe('borrowBook', () => {
+    it('should borrow a book, decrease its count, and update availability', async () => {
+      const bookId = 'bookId';
+      const userId = 'userId';
 
-      const result = await service.addBook(title, author, count);
+      const result = await service.borrowBook(bookId);
 
-  
-      expect(mockBookModel).toHaveBeenCalledWith({
-        title,
-        author,
-        count,
-        isAvailable: true,
-      }); 
-
+      expect(bookModel.findById).toHaveBeenCalledWith(bookId);
+      expect(mockBookInstance.save).toHaveBeenCalled();
       expect(result).toEqual({
+        _id: 'bookId',
         title: 'Test Book',
         author: 'Test Author',
-        count: 5,
-        isAvailable: true,
+        count: 0,
+        isAvailable: false,
       });
     });
   });

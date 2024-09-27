@@ -14,5 +14,10 @@ export class BooksController {
   ) {
     return this.booksService.addBook(title, author, count);
   }
-
+  
+  @Post('borrow/:id')
+  async borrowBook(@Param('id') bookId: string) {
+    return this.booksService.borrowBook(bookId);
+  }
+  
 }

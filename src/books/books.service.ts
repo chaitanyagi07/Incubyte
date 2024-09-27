@@ -15,5 +15,24 @@ export class BooksService {
         const newBook = new this.bookModel({ title, author, count, isAvailable: count > 0 });
         return newBook.save();
       }
+      async borrowBook(bookId: string): Promise<Book> {
+        const book = await this.bookModel.findById(bookId);
+    
+        if (book.count <= 0) {
+          throw new Error('No copies available for this book');
+        }
+    
+        // Decrease the count
+        book.count -= 1;
+    
+        // Update availability status
+        if (book.count === 0) {
+          book.isAvailable = false;
+        }
+    
+        return book.save();
+      }
+      
+    
 
 }

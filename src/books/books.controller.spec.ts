@@ -10,6 +10,15 @@ describe('BooksController', () => {
     addBook: jest.fn((title: string, author: string, count: number) => {
       return { title, author, count, isAvailable: count > 0 };
     }),
+    borrowBook: jest.fn((bookId: string) => {
+      return {
+        _id: bookId,
+        title: 'Test Book',
+        author: 'Test Author',
+        count: 0,
+        isAvailable: false,
+      };
+    }),
   };
 
   beforeEach(async () => {
@@ -45,4 +54,21 @@ describe('BooksController', () => {
       });
     });
   });
+
+  describe('borrowBook', () => {
+    it('should borrow a book and return the updated book', async () => {
+      const bookId = '12345';
+      const result = await controller.borrowBook(bookId);
+
+      expect(booksService.borrowBook).toHaveBeenCalledWith(bookId);
+      expect(result).toEqual({
+        _id: bookId,
+        title: 'Test Book',
+        author: 'Test Author',
+        count: 0,
+        isAvailable: false,
+      });
+    });
+  });
 });
+
