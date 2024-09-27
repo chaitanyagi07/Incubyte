@@ -28,6 +28,10 @@ describe('BooksController', () => {
         isAvailable: true,
       };
     }),
+    getAvailableBooks: jest.fn(() => [
+      { title: 'Available Book 1', author: 'Author 1', count: 5, isAvailable: true },
+      { title: 'Available Book 2', author: 'Author 2', count: 2, isAvailable: true },
+    ]),
   };
 
   beforeEach(async () => {
@@ -92,6 +96,17 @@ describe('BooksController', () => {
         count: 1,
         isAvailable: true,
       });
+    });
+  });
+  describe('getAvailableBooks', () => {
+    it('should return a list of available books', async () => {
+      const result = await controller.getAvailableBooks();
+
+      expect(booksService.getAvailableBooks).toHaveBeenCalled();
+      expect(result).toEqual([
+        { title: 'Available Book 1', author: 'Author 1', count: 5, isAvailable: true },
+        { title: 'Available Book 2', author: 'Author 2', count: 2, isAvailable: true },
+      ]);
     });
   });
 });

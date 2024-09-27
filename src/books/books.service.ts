@@ -42,7 +42,11 @@ export class BooksService {
     
         return book.save();
       }
-    
+
+      async getAvailableBooks(): Promise<Book[]> {
+        return this.bookModel.find({ count: { $gt: 0 } }).exec();
+      }
+      
     
 
 }

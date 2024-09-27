@@ -24,5 +24,10 @@ export class BooksController {
   async returnBook(@Param('id') bookId: string) {
     return this.booksService.returnBook(bookId);
   }
-
+   
+  @Get('available')
+  async getAvailableBooks() {
+    return this.booksService.getAvailableBooks();
+  }
+ 
 }

@@ -47,9 +47,15 @@ describe('BooksService', () => {
     save: jest.fn().mockResolvedValue(true),
   };
 
+  const mockAvailableBooks = [
+    { title: 'Available Book 1', author: 'Author 1', count: 5, isAvailable: true },
+    { title: 'Available Book 2', author: 'Author 2', count: 2, isAvailable: true },
+  ];
+
   const mockBookModel = {
     findById: jest.fn().mockResolvedValue(mockBookInstance),
   };
+  
   const mockReturnedBookModel = {
     findById: jest.fn().mockResolvedValue(mockReturnedBookInstance),
   };
@@ -103,7 +109,6 @@ describe('BooksService', () => {
     it('should return a book, increase its count, and update availability', async () => {
       const bookId = 'bookId';
 
-      // Mocking the returned book instance separately to simulate return
       const moduleWithReturnedBook = await Test.createTestingModule({
         providers: [
           BooksService,
@@ -124,6 +129,41 @@ describe('BooksService', () => {
 
       expect(mockReturnedBookModel.findById).toHaveBeenCalledWith(bookId);
       expect(mockReturnedBookInstance.save).toHaveBeenCalled();
+      expect(result).toEqual({
+        _id: 'bookId',
+        title: 'Test Book',
+        author: 'Test Author',
+        count: 2,
+        isAvailable: true,
+      });
+    });
+  });
+  
+  describe('borrowBook', () => {
+    it('should borrow a book, decrease its count, and update availability', async () => {
+      const bookId = 'bookId';
+      const userId = 'userId';
+
+      const moduleWithReturnedBook = await Test.createTestingModule({
+        providers: [
+          BooksService,
+          {
+            provide: getModelToken(Book.name),
+            useValue: mockReturnedBookModel,
+          },
+          {
+            provide: getModelToken(User.name),
+            useValue: mockUserModel,
+          },
+        ],
+      }).compile();
+
+      service = moduleWithReturnedBook.get<BooksService>(BooksService);
+
+      const result = await service.borrowBook(bookId);
+
+      expect(bookModel.findById).toHaveBeenCalledWith(bookId);
+      expect(mockBookInstance.save).toHaveBeenCalled();
       expect(result).toEqual({
         _id: 'bookId',
         title: 'Test Book',
