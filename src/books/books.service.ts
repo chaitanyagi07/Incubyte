@@ -22,17 +22,27 @@ export class BooksService {
           throw new Error('No copies available for this book');
         }
     
-        // Decrease the count
         book.count -= 1;
     
-        // Update availability status
         if (book.count === 0) {
           book.isAvailable = false;
         }
     
         return book.save();
       }
-      
+
+      async returnBook(bookId: string): Promise<Book> {
+        const book = await this.bookModel.findById(bookId);
+
+        book.count += 1;
+    
+        if (book.count > 0) {
+          book.isAvailable = true;
+        }
+    
+        return book.save();
+      }
+    
     
 
 }

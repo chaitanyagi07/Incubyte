@@ -26,6 +26,21 @@ describe('BooksService', () => {
     }),
   };
 
+  const mockReturnedBookInstance = {
+    _id: 'bookId',
+    title: 'Test Book',
+    author: 'Test Author',
+    count: 1,
+    isAvailable: true,
+    save: jest.fn().mockResolvedValue({
+      _id: 'bookId',
+      title: 'Test Book',
+      author: 'Test Author',
+      count: 2,
+      isAvailable: true,
+    }),
+  };
+
   const mockUserInstance = {
     _id: 'userId',
     borrowedBooks: [],
@@ -35,7 +50,9 @@ describe('BooksService', () => {
   const mockBookModel = {
     findById: jest.fn().mockResolvedValue(mockBookInstance),
   };
-
+  const mockReturnedBookModel = {
+    findById: jest.fn().mockResolvedValue(mockReturnedBookInstance),
+  };
   const mockUserModel = {
     findById: jest.fn().mockResolvedValue(mockUserInstance),
   };
@@ -79,6 +96,40 @@ describe('BooksService', () => {
         author: 'Test Author',
         count: 0,
         isAvailable: false,
+      });
+    });
+  });
+  describe('returnBook', () => {
+    it('should return a book, increase its count, and update availability', async () => {
+      const bookId = 'bookId';
+
+      // Mocking the returned book instance separately to simulate return
+      const moduleWithReturnedBook = await Test.createTestingModule({
+        providers: [
+          BooksService,
+          {
+            provide: getModelToken(Book.name),
+            useValue: mockReturnedBookModel,
+          },
+          {
+            provide: getModelToken(User.name),
+            useValue: mockUserModel,
+          },
+        ],
+      }).compile();
+
+      service = moduleWithReturnedBook.get<BooksService>(BooksService);
+
+      const result = await service.returnBook(bookId);
+
+      expect(mockReturnedBookModel.findById).toHaveBeenCalledWith(bookId);
+      expect(mockReturnedBookInstance.save).toHaveBeenCalled();
+      expect(result).toEqual({
+        _id: 'bookId',
+        title: 'Test Book',
+        author: 'Test Author',
+        count: 2,
+        isAvailable: true,
       });
     });
   });

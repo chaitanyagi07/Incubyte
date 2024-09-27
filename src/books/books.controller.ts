@@ -19,5 +19,10 @@ export class BooksController {
   async borrowBook(@Param('id') bookId: string) {
     return this.booksService.borrowBook(bookId);
   }
-  
+
+  @Post('return/:id')
+  async returnBook(@Param('id') bookId: string) {
+    return this.booksService.returnBook(bookId);
+  }
+
 }

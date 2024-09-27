@@ -19,6 +19,15 @@ describe('BooksController', () => {
         isAvailable: false,
       };
     }),
+    returnBook: jest.fn((bookId: string) => {
+      return {
+        _id: bookId,
+        title: 'Test Book',
+        author: 'Test Author',
+        count: 1,
+        isAvailable: true,
+      };
+    }),
   };
 
   beforeEach(async () => {
@@ -67,6 +76,21 @@ describe('BooksController', () => {
         author: 'Test Author',
         count: 0,
         isAvailable: false,
+      });
+    });
+  });
+  describe('returnBook', () => {
+    it('should return a book and increase its count', async () => {
+      const bookId = '12345';
+      const result = await controller.returnBook(bookId);
+
+      expect(booksService.returnBook).toHaveBeenCalledWith(bookId);
+      expect(result).toEqual({
+        _id: bookId,
+        title: 'Test Book',
+        author: 'Test Author',
+        count: 1,
+        isAvailable: true,
       });
     });
   });
