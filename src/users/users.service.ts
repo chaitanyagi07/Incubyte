@@ -16,4 +16,26 @@ export class UsersService {
         return await newUser.save(); 
     }
     
+    
+    async borrowBook(userId: string, bookId: string): Promise<User> {
+        const user = await this.userModel.findById(userId).populate('borrowedBooks');
+        const book = await this.bookModel.findById(bookId);
+    
+        if (book.count <= 0) {
+            throw new Error('No copies available for this book');
+        }
+    
+        // Update book count and availability
+        book.count -= 1;
+        if (book.count === 0) {
+            book.isAvailable = false;
+        }
+        await book.save();
+    
+        // Add the book to the user's borrowedBooks list
+        user.borrowedBooks.push(book);
+        await user.save(); // Ensure you await the save operation here
+    
+        return user; // Make sure to return the updated user instance
+    }
 }

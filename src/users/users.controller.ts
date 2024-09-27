@@ -13,4 +13,13 @@ export class UsersController {
   ) {
     return this.usersService.registerUser(username, email, password);
   }
+  
+  @Post(':userId/borrow/:bookId')
+  async borrowBook(
+    @Param('userId') userId: string,
+    @Param('bookId') bookId: string
+  ) {
+    return this.usersService.borrowBook(userId, bookId);
+  }
+   
 }
